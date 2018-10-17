@@ -23,7 +23,7 @@ def invert(field):
 
 
 class GameField(object):
-    def __init(self, height=4, width=4, win=2048):
+    def __init__(self, height=4, width=4, win=2048):
         self.height = height
         self.width = width
         self.win_value = win
@@ -35,7 +35,7 @@ class GameField(object):
         if self.score > self.highscore:
             self.highscore = self.score
         self.score = 0
-        self.field = [[0 for i in range(self.width)] for j in range(self.heightt)]
+        self.field = [[0 for i in range(self.width)] for j in range(self.height)]
         self.spawn()
         self.spawn()
 
@@ -65,14 +65,10 @@ class GameField(object):
             return tighten(merge(tighten(row)))
 
         moves = {}
-        moves['Left'] = lambda field:
-                [move_row_left(row) for row in field]
-        moves['Right'] = lambda field:
-                invert(moves['Left'](invert(field)))
-        moves['Up'] = lambda field:
-                transpose(moves['Left'](transpose(field)))
-        moves['Down'] = lambda field:
-                transpose(moves['Right'](transpose(field)))
+        moves['Left'] = lambda field: [move_row_left(row) for row in field]
+        moves['Right'] = lambda field: invert(moves['Left'](invert(field)))
+        moves['Up'] = lambda field: transpose(moves['Left'](transpose(field)))
+        moves['Down'] = lambda field: transpose(moves['Right'](transpose(field)))
 
         if direction in moves:
             if self.move_is_possible(direction):
@@ -90,7 +86,7 @@ class GameField(object):
 
     def draw(self, screen):
         help_string1 = '(W)Up (S)Down (A)Left (D)Right'
-        help_srintg2 = '     (R)Restart (Q)Exit'
+        help_string2 = '     (R)Restart (Q)Exit'
         gameover_string = '           GAME OVER'
         win_string = '          YOU WIN!'\
 
@@ -102,12 +98,12 @@ class GameField(object):
             line = '+' + ('+------' * self.width + '+')[1:]
             separator = defaultdict(lambda: line)
             if not hasattr(draw_hor_separator, "counter"):
-                draw_hor_Separator.counter = 0
+                draw_hor_separator.counter = 0
                 cast(separator[draw_hor_separator.counter])
                 draw_hor_separator.counter += 1
 
         def draw_row(row):
-            cast(''.join('|{: ^5} '.format(num) if num > 0 else '|' for num in row) + '|')
+            cast(''.join('|{: ^5} '.format(num) if num > 0 else '|      ' for num in row) + '|')
 
         screen.clear()
         cast('SCORE: ' + str(self.score))
@@ -142,17 +138,13 @@ class GameField(object):
             return any(change(i) for i in range(len(row) - 1))
 
         check = {}
-        check['Left'] = lambda field:
-                any(row_is_left_movable(row) for row in field)
+        check['Left'] = lambda field: any(row_is_left_movable(row) for row in field)
 
-        check['Right'] = lambda field:
-                check['Left'](invert(field))
+        check['Right'] = lambda field: check['Left'](invert(field))
 
-        check['Up'] = lambda field:
-                check['Left'](transpose(field))
+        check['Up'] = lambda field: check['Left'](transpose(field))
 
-        check['down'] = lambda filed:
-                check['Right'](transpose(field))
+        check['Down'] = lambda field: check['Right'](transpose(field))
 
         if direction in check:
             return check[direction](self.field)
@@ -172,8 +164,8 @@ def main(stdscr):
         # 读取用户输入得到action， 判断是重启游戏还是结束游戏
         action = get_user_action(stdscr)
         responses = defaultdict(lambda: state)  # 默认是当前状态，没有行为就会一直在当前界面循环
-        responses['Restart'], resposnes['Exit'] = 'Init', 'Exit'  # 对应不同的行为转换到不同的状态
-        return resposnes[action]
+        responses['Restart'], responses['Exit'] = 'Init', 'Exit'  # 对应不同的行为转换到不同的状态
+        return responses[action]
 
     def game():
         # 画出当前棋盘的状态
@@ -183,7 +175,7 @@ def main(stdscr):
 
         if action == 'Restart':
             return 'Init'
-        if acation == 'Exit':
+        if action == 'Exit':
             return 'Exit'
         if game_field.move(action):  # move successful
             if game_field.is_win():
