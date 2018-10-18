@@ -170,7 +170,7 @@ class GameManager(object):
     def __init__(self, size=4, win_num=2048):
         self.size = size
         self.win_num = win_num
-        self.reset
+        self.reset()
 
     def reset(self):
         self.state = 'init'
